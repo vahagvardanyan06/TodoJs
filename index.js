@@ -3,6 +3,8 @@ const todoForm = document.querySelector(".todo_form");
 const todoInput = document.querySelector(".todo_input")
 const todoFooter = document.querySelector(".todo_footer");
 
+
+
 todoForm.addEventListener("submit", (evt)=>{
     evt.preventDefault()
 })
@@ -18,7 +20,10 @@ function addTodo(){
 
     text: todoInput.value,
     complited: false,
-    id: new Date().getTime()
+    id: new Date().getTime(),
+    currentTime: `${new Date().getHours()}: ${new Date().getMinutes()}`,
+    deadLine:"",
+    deadLineCompleted: false,
     
   }
 
@@ -88,13 +93,32 @@ function drawTodos(todos){
 
 
         const todoCreatedTime = document.createElement("span")
-        todoCreatedTime.innerHTML = ` created time   ${new Date().getHours()}: ${new Date().getMinutes()}`
+        todoCreatedTime.innerHTML = ` created time   ${todo.currentTime}`
 
               todoCreatedTime.style.color = "green"
-              
+
+
+        const todoDeadLine = document.createElement("input");
+              todoDeadLine.type = "time";
+        
+        let deadLineTimeout;   
+        todoDeadLine.addEventListener("input", (e)=>{
+                    
+            clearTimeout(deadLineTimeout)
+
+                deadLineTimeout =  setTimeout(()=>{
+
+            deadLineInputChange(todo, e.target.value)
+
+          },2000) 
+        
+        })      
+      
+                      
         todoLabel.appendChild(todoCreatedTime)
+        todoLabel.appendChild(todoDeadLine)
               
-        todoDiv.appendChild(editTodoBtn)    
+        todoDiv.appendChild(editTodoBtn)  
         todoDiv.appendChild(removeTodoBtn);
 
         root.appendChild(todoDiv);
@@ -182,3 +206,39 @@ function editInputChange(todo, newText){
         drawTodos(todos)
     
 }
+
+
+function deadLineInputChange(todo, deadLine){
+
+    todos.forEach((t)=>{
+        if(todo.id = t.id){
+            t.deadLine = deadLine
+        }
+    })
+}
+
+
+const reminder = setInterval(()=>{
+
+    todos.forEach((todo)=>{
+
+
+        if(todo.deadLineCompleted){
+
+            console.log(todo);
+
+            return
+        }
+
+        
+       if(new Date().getHours() == todo.deadLine[0]+todo.deadLine[1] && todo.deadLine!= ""){
+
+            todo.deadLineCompleted = !todo.deadLineCompleted;
+             console.log(todo.text);
+       }
+        
+
+    })
+    
+
+},1000)
